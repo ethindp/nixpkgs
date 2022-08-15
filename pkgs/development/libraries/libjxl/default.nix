@@ -21,45 +21,16 @@
 
 stdenv.mkDerivation rec {
   pname = "libjxl";
-  version = "0.6.1";
+  version = "0.7rc";
 
   src = fetchFromGitHub {
     owner = "libjxl";
     repo = "libjxl";
     rev = "v${version}";
-    sha256 = "sha256-fTK5hyU9PZ6nigMsfzVugwviihgAXfEcLF+l+n5h+54=";
+    hash = "sha256-1ES4jo8IhmMMyLsVaBhJmWJSJWkgP8i6lIrT441SghE=";
     # There are various submodules in `third_party/`.
     fetchSubmodules = true;
   };
-
-  patches = [
-    # present in master, remove after 0.7?
-    (fetchpatch {
-      name = "fix-link-lld-macho.patch";
-      url = "https://github.com/libjxl/libjxl/commit/88fe3fff3dc70c72405f57c69feffd9823930034.patch";
-      sha256 = "1419fyiq4srpj72cynwyvqy8ldi7vn9asvkp5fsbmiqkyhb15jpk";
-    })
-
-    # "robust statistics" have been removed in upstream mainline as they are
-    # conidered to cause "interoperability problems". sure enough the tests
-    # fail with precision issues on aarch64.
-    (fetchpatch {
-      name = "remove-robust-and-descriptive-statistics.patch";
-      url = "https://github.com/libjxl/libjxl/commit/204f87a5e4d684544b13900109abf040dc0b402b.patch";
-      sha256 = "sha256-DoAaYWLmQ+R9GZbHMTYGe0gBL9ZesgtB+2WhmbARna8=";
-    })
-
-    # fix build with asciidoc wrapped in shell script
-    (fetchpatch {
-      url = "https://github.com/libjxl/libjxl/commit/b8ec58c58c6281987f42ebec892f513824c0cc0e.patch";
-      hash = "sha256-g8U+YVhLfgSHJ+PWJgvVOI66+FElJSC8IgSRodNnsMw=";
-    })
-    (fetchpatch {
-      url = "https://github.com/libjxl/libjxl/commit/ca8e276aacf63a752346a6a44ba673b0af993237.patch";
-      excludes = [ "AUTHORS" ];
-      hash = "sha256-9VXy1LdJ0JhYbCGPNMySpnGLBxUrr8BYzE+oU3LnUGw=";
-    })
-  ];
 
   nativeBuildInputs = [
     cmake
@@ -112,7 +83,7 @@ stdenv.mkDerivation rec {
     "-DJPEGXL_FORCE_SYSTEM_BROTLI=ON"
 
     # Use our version of highway, though it is still statically linked in
-    "-DJPEGXL_FORCE_SYSTEM_HWY=ON"
+    "-DJPEGXL_FORCE_SYSTEM_HWY=OFF"
 
     # TODO: Update this package to enable this (overridably via an option):
     # Viewer tools for evaluation.
